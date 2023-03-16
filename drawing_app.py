@@ -1,5 +1,4 @@
 from tkinter import *
-import tkinter.font
 
 class DrawingApp:
     drawing_tool = "pencil"
@@ -48,11 +47,3 @@ class DrawingApp:
         drawing_area.bind("<Motion>", self.motion)
         drawing_area.bind("<ButtonPress-1>", self.clicked)
         drawing_area.bind("<ButtonRelease-1>", self.unclicked)
-
-root = Tk()
-
-drawing_app = DrawingApp(root)
-root.mainloop()
-
-
-
