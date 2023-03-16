@@ -6,16 +6,18 @@ class DrawingApp:
 
     mouse_clicked = False
 
-    x_pos, y_pos = None, None
+    x_pos, y_pos = None, None #current position of the mouse
 
-    x1, y1, x2, y2 = None, None, None, None
+    x1, y1, x2, y2 = None, None, None, None #first and last position of the mouse when using line, rectangle etc
 
+    # when the user clicks left mouse button
     def clicked(self, event=None):
         self.mouse_clicked = True
 
         self.x1 = event.x
         self.y1 = event.y
 
+    # when the user releases left mouse button
     def unclicked(self, event=None):
         self.mouse_clicked = False
 
@@ -38,7 +40,7 @@ class DrawingApp:
 
     def line_draw(self, event=None):
         if None not in (self.x1,self.y1,self.x2,self.y2):
-            event.widget.create_line(self.x1, self.y1,self.x2,self.y2, smooth=True, fill="green")
+            event.widget.create_line(self.x1, self.y1,self.x2,self.y2, smooth=True, fill="red")
 
     def __init__(self, root):
         drawing_area = Canvas()
