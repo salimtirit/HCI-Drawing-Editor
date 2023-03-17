@@ -31,23 +31,28 @@ class DrawingApp:
         if self.x_pos and self.y_pos and self.drawing_tool == "oval":
             self.canvas.create_oval(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color,
                                     width=self.size_button.get())
-        # draws straight line with first and last position of the cursor after dragging
-        if self.x_pos and self.y_pos and self.drawing_tool == "line":
-            self.line_draw(event)
+
 
         self.x_pos = None
         self.y_pos = None
 
+        # draws straight line with first and last position of the cursor after dragging
+
         self.x2 = event.x
         self.y2 = event.y
 
+        if self.drawing_tool == "line":
+            self.line_draw(event)
 
 
     def motion(self, event=None):
         if self.mouse_clicked:
-            if self.x_pos is not None and self.y_pos is not None and self.drawing_tool == "pencil":
-                event.widget.create_line(self.x_pos, self.y_pos, event.x, event.y, smooth=True, fill=self.color,
-                                         width=self.size_button.get())
+            if self.x_pos is not None and self.y_pos is not None:
+                if self.drawing_tool == "pencil":
+                    event.widget.create_line(self.x_pos, self.y_pos, event.x, event.y, smooth=True, fill=self.color, width=self.size_button.get())
+               #this eraser is simply a very thick pencil that has the same color with the background. I believe a better version may be implemented. Although this is a backup :)
+                #elif self.drawing_tool == "eraser":
+                    #event.widget.create_line(self.x_pos, self.y_pos, event.x, event.y, smooth=True, fill="white", width=self.size_button.get()*5)
             self.x_pos = event.x
             self.y_pos = event.y
 
@@ -72,11 +77,14 @@ class DrawingApp:
     def line_mode(self):
         self.drawing_tool = "line"
 
+    #def eraser_mode(self):
+    #    self.drawing_tool = "eraser"
+
     def __init__(self, root):
         self.x = 0
         self.y = 0
 
-        drawing_area = Canvas(width=400, height=450)
+        drawing_area = Canvas(width=450, height=500, background="white")
         drawing_area.pack(fill="both")
         drawing_area.bind("<Motion>", self.motion)
         drawing_area.bind("<ButtonPress-1>", self.clicked)
@@ -94,5 +102,7 @@ class DrawingApp:
         line_button.pack(side="left", padx=70, pady=10)
         color_button = tkinter.Button(text="Color", command=self.choose_color)
         color_button.pack(side="left", padx=75, pady=10)
+        #eraser_button = tkinter.Button(text="Eraser", command=self.eraser_mode)
+        #eraser_button.pack(side="left", padx=80, pady=10)
         self.size_button = Scale(label="Thickness", from_=1, to=10, orient=HORIZONTAL)
-        self.size_button.pack(side="left", padx=80, pady=10)
+        self.size_button.pack(side="left", padx=85, pady=10)
