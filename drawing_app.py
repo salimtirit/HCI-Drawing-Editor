@@ -49,6 +49,14 @@ class DrawingApp:
         self.x2 = event.x
         self.y2 = event.y
 
+    def undo(self):
+        x = self.stack.pop()
+        self.recentlyDeleted.append(x)
+        self.canvas.delete(x)
+
+    def redo(self):
+        self.canvas.insert(self.recentlyDeleted.pop())
+
 
     def motion(self, event=None):
         self.canvas.delete('temp_objects')
@@ -98,14 +106,15 @@ class DrawingApp:
         self.Rectangles = []
         self.Drawing = []
         self.stack = []
+        self.recentlyDeleted = []
 
-        rect_button = tkinter.Button(text="Rectangle", command=self.set_brush_type("rectangle"))
+        rect_button = tkinter.Button(text="Rectangle", command=lambda: self.set_brush_type("rectangle"))
         rect_button.pack(side="left", padx=55, pady=10)
-        pencil_button = tkinter.Button(text="Pencil", command=self.set_brush_type("pencil"))
+        pencil_button = tkinter.Button(text="Pencil", command=lambda: self.set_brush_type("pencil"))
         pencil_button.pack(side="left", padx=60, pady=10)
-        circle_button = tkinter.Button(text="Circle", command=self.set_brush_type("oval"))
+        circle_button = tkinter.Button(text="Circle", command=lambda: self.set_brush_type("oval"))
         circle_button.pack(side="left", padx=65, pady=10)
-        line_button = tkinter.Button(text="Line", command=self.set_brush_type("line"))
+        line_button = tkinter.Button(text="Line", command=lambda: self.set_brush_type("line"))
         line_button.pack(side="left", padx=70, pady=10)
         color_button = tkinter.Button(text="Color", command=self.choose_color)
         color_button.pack(side="left", padx=75, pady=10)
