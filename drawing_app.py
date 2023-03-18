@@ -28,16 +28,17 @@ class DrawingApp:
         if self.x_pos and self.y_pos and self.drawing_tool == "rectangle":
             x = self.canvas.create_rectangle(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color,
                                          width=self.size_button.get())
-                                         
+            self.Rectangles.append(x) 
         # draws oval with first and last position of the cursor after dragging
         if self.x_pos and self.y_pos and self.drawing_tool == "oval":
             x = self.canvas.create_oval(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color,
                                     width=self.size_button.get())
-
+            self.Circles.append(x)
         if self.x_pos and self.y_pos and self.drawing_tool == "line":
             x = self.canvas.create_line(self.x1, self.y1, self.x_pos, self.y_pos, smooth=True, fill=self.color,
                                      width=self.size_button.get())
-
+            self.Lines.append(x)
+        
         self.stack.append(x)
 
         self.x_pos = None
@@ -54,7 +55,8 @@ class DrawingApp:
         if self.mouse_clicked:
             if self.x_pos is not None and self.y_pos is not None:
                 if self.drawing_tool == "pencil":
-                    self.canvas.create_line(self.x_pos, self.y_pos, event.x, event.y, smooth=True, fill=self.color, width=self.size_button.get())
+                    x = self.canvas.create_line(self.x_pos, self.y_pos, event.x, event.y, smooth=True, fill=self.color, width=self.size_button.get())
+                    self.Drawing.append(x)
                #this eraser is simply a very thick pencil that has the same color with the background. I believe a better version may be implemented. Although this is a backup :)
                 #elif self.drawing_tool == "eraser":
                     #event.widget.create_line(self.x_pos, self.y_pos, event.x, event.y, smooth=True, fill="white", width=self.size_button.get()*5)
@@ -90,6 +92,12 @@ class DrawingApp:
         drawing_area.bind("<ButtonRelease-1>", self.unclicked)
         self.canvas = drawing_area
         self.color = None
+                
+        self.Lines = []
+        self.Circles = []
+        self.Rectangles = []
+        self.Drawing = []
+        self.stack = []
 
         rect_button = tkinter.Button(text="Rectangle", command=self.set_brush_type("rectangle"))
         rect_button.pack(side="left", padx=55, pady=10)
