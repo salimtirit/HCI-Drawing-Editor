@@ -73,17 +73,8 @@ class DrawingApp:
         self.color = askcolor(color=self.color)[1]
 
     #these methods sets the brush type
-    def rect_mode(self):
-        self.drawing_tool = "rectangle"
-
-    def oval_mode(self):
-        self.drawing_tool = "oval"
-
-    def pencil_mode(self):
-        self.drawing_tool = "pencil"
-
-    def line_mode(self):
-        self.drawing_tool = "line"
+    def set_brush_type(self, type):
+        self.drawing_tool = type
 
     #def eraser_mode(self):
     #    self.drawing_tool = "eraser"
@@ -100,13 +91,13 @@ class DrawingApp:
         self.canvas = drawing_area
         self.color = None
 
-        rect_button = tkinter.Button(text="Rectangle", command=self.rect_mode)
+        rect_button = tkinter.Button(text="Rectangle", command=self.set_brush_type("rectangle"))
         rect_button.pack(side="left", padx=55, pady=10)
-        pencil_button = tkinter.Button(text="Pencil", command=self.pencil_mode)
+        pencil_button = tkinter.Button(text="Pencil", command=self.set_brush_type("pencil"))
         pencil_button.pack(side="left", padx=60, pady=10)
-        circle_button = tkinter.Button(text="Circle", command=self.oval_mode)
+        circle_button = tkinter.Button(text="Circle", command=self.set_brush_type("oval"))
         circle_button.pack(side="left", padx=65, pady=10)
-        line_button = tkinter.Button(text="Line", command=self.line_mode)
+        line_button = tkinter.Button(text="Line", command=self.set_brush_type("line"))
         line_button.pack(side="left", padx=70, pady=10)
         color_button = tkinter.Button(text="Color", command=self.choose_color)
         color_button.pack(side="left", padx=75, pady=10)
