@@ -22,16 +22,23 @@ class DrawingApp:
 
     # when the user releases left mouse button
     def unclicked(self, event=None):
+        self.canvas.delete('temp_objects')
         self.mouse_clicked = False
         #draws rectangle with first and last position of the cursor after dragging
         if self.x_pos and self.y_pos and self.drawing_tool == "rectangle":
-            self.canvas.create_rectangle(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color,
+            x = self.canvas.create_rectangle(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color,
                                          width=self.size_button.get())
+                                         
         # draws oval with first and last position of the cursor after dragging
         if self.x_pos and self.y_pos and self.drawing_tool == "oval":
-            self.canvas.create_oval(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color,
+            x = self.canvas.create_oval(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color,
                                     width=self.size_button.get())
 
+        if self.x_pos and self.y_pos and self.drawing_tool == "line":
+            x = self.canvas.create_line(self.x1, self.y1, self.x_pos, self.y_pos, smooth=True, fill=self.color,
+                                     width=self.size_button.get())
+
+        self.stack.append(x)
 
         self.x_pos = None
         self.y_pos = None
@@ -41,25 +48,26 @@ class DrawingApp:
         self.x2 = event.x
         self.y2 = event.y
 
-        if self.drawing_tool == "line":
-            self.line_draw(event)
-
 
     def motion(self, event=None):
+        self.canvas.delete('temp_objects')
         if self.mouse_clicked:
             if self.x_pos is not None and self.y_pos is not None:
                 if self.drawing_tool == "pencil":
-                    event.widget.create_line(self.x_pos, self.y_pos, event.x, event.y, smooth=True, fill=self.color, width=self.size_button.get())
+                    self.canvas.create_line(self.x_pos, self.y_pos, event.x, event.y, smooth=True, fill=self.color, width=self.size_button.get())
                #this eraser is simply a very thick pencil that has the same color with the background. I believe a better version may be implemented. Although this is a backup :)
                 #elif self.drawing_tool == "eraser":
                     #event.widget.create_line(self.x_pos, self.y_pos, event.x, event.y, smooth=True, fill="white", width=self.size_button.get()*5)
+                elif self.drawing_tool == "rectangle":
+                    self.canvas.create_rectangle(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color, width=self.size_button.get(),tags='temp_objects')          
+                elif self.drawing_tool == "oval":
+                    self.canvas.create_oval(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color, width=self.size_button.get(),tags="temp_objects")
+                elif self.drawing_tool == "line":
+                    self.canvas.create_line(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color, width=self.size_button.get(),tags="temp_objects")
+
             self.x_pos = event.x
             self.y_pos = event.y
 
-    def line_draw(self, event=None):
-        if None not in (self.x1, self.y1, self.x2, self.y2):
-            event.widget.create_line(self.x1, self.y1, self.x2, self.y2, smooth=True, fill=self.color,
-                                     width=self.size_button.get())
     #displays color selector
     def choose_color(self):
         self.color = askcolor(color=self.color)[1]
