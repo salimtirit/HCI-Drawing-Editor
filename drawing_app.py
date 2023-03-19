@@ -26,22 +26,7 @@ class DrawingApp:
         self.mouse_clicked = False
         #draws rectangle with first and last position of the cursor after dragging
         if self.x_pos and self.y_pos:
-            if self.drawing_tool == "rectangle":
-                x = self.canvas.create_rectangle(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color,
-                                         width=self.size_button.get())
-                self.Rectangles.append(x) 
-            # draws oval with first and last position of the cursor after dragging
-            if self.drawing_tool == "oval":
-                x = self.canvas.create_oval(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color,
-                                    width=self.size_button.get())
-                self.Circles.append(x)
-            if self.drawing_tool == "line":
-                x = self.canvas.create_line(self.x1, self.y1, self.x_pos, self.y_pos, smooth=True, fill=self.color,
-                                     width=self.size_button.get())
-                self.Lines.append(x)
-        
-            self.stack.append([x, self.x1, self.y1, self.x_pos, self.y_pos, self.color,self.size_button.get(), self.drawing_tool])
-
+            self.draw(self.drawing_tool, self.color, self.size_button.get(), [self.x1, self.y1, self.x_pos, self.y_pos])
         self.x_pos = None
         self.y_pos = None
 
@@ -50,6 +35,23 @@ class DrawingApp:
         self.x2 = event.x
         self.y2 = event.y
 
+    def draw(self, tool, color, w, coordinates = []):
+        if tool == "rectangle":
+            x = self.canvas.create_rectangle(coordinates[0], coordinates[1], coordinates[2], coordinates[3], outline=color,
+                                     width=w)
+            self.Rectangles.append(x)
+        # draws oval with first and last position of the cursor after dragging
+        if tool == "oval":
+            x = self.canvas.create_oval(coordinates[0], coordinates[1], coordinates[2], coordinates[3], outline=color,
+                                width=w)
+            self.Circles.append(x)
+        if tool == "line":
+            x = self.canvas.create_line(coordinates[0], coordinates[1], coordinates[2], coordinates[3], smooth=True, fill=color,
+                                 width=w)
+            self.Lines.append(x)
+    
+        self.stack.append([x, self.drawing_tool, color, w, [coordinates[0], coordinates[1], coordinates[2], coordinates[3]]])
+
     def undo(self):
         properties = self.stack.pop()
         self.recentlyDeleted.append(properties)
@@ -57,6 +59,8 @@ class DrawingApp:
         self.canvas.delete(properties[0])
 
     def redo(self):
+        recent = self.recentlyDeleted.pop()
+        self.draw(recent[1],recent[2],recent[3],recent[4])
         self.canvas.insert(self.recentlyDeleted.pop())
 
 
