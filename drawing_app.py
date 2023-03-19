@@ -25,21 +25,22 @@ class DrawingApp:
         self.canvas.delete('temp_objects')
         self.mouse_clicked = False
         #draws rectangle with first and last position of the cursor after dragging
-        if self.x_pos and self.y_pos and self.drawing_tool == "rectangle":
-            x = self.canvas.create_rectangle(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color,
+        if self.x_pos and self.y_pos:
+            if self.drawing_tool == "rectangle":
+                x = self.canvas.create_rectangle(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color,
                                          width=self.size_button.get())
-            self.Rectangles.append(x) 
-        # draws oval with first and last position of the cursor after dragging
-        if self.x_pos and self.y_pos and self.drawing_tool == "oval":
-            x = self.canvas.create_oval(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color,
+                self.Rectangles.append(x) 
+            # draws oval with first and last position of the cursor after dragging
+            if self.drawing_tool == "oval":
+                x = self.canvas.create_oval(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color,
                                     width=self.size_button.get())
-            self.Circles.append(x)
-        if self.x_pos and self.y_pos and self.drawing_tool == "line":
-            x = self.canvas.create_line(self.x1, self.y1, self.x_pos, self.y_pos, smooth=True, fill=self.color,
+                self.Circles.append(x)
+            if self.drawing_tool == "line":
+                x = self.canvas.create_line(self.x1, self.y1, self.x_pos, self.y_pos, smooth=True, fill=self.color,
                                      width=self.size_button.get())
-            self.Lines.append(x)
+                self.Lines.append(x)
         
-        self.stack.append(x)
+            self.stack.append([x, self.x1, self.y1, self.x_pos, self.y_pos, self.color,self.size_button.get(), self.drawing_tool])
 
         self.x_pos = None
         self.y_pos = None
@@ -50,9 +51,10 @@ class DrawingApp:
         self.y2 = event.y
 
     def undo(self):
-        x = self.stack.pop()
-        self.recentlyDeleted.append(x)
-        self.canvas.delete(x)
+        properties = self.stack.pop()
+        self.recentlyDeleted.append(properties)
+        print(properties)
+        self.canvas.delete(properties[0])
 
     def redo(self):
         self.canvas.insert(self.recentlyDeleted.pop())
@@ -120,5 +122,9 @@ class DrawingApp:
         color_button.pack(side="left", padx=75, pady=10)
         #eraser_button = tkinter.Button(text="Eraser", command=self.eraser_mode)
         #eraser_button.pack(side="left", padx=80, pady=10)
+        undo_button = tkinter.Button(text="undo", command=self.undo)
+        undo_button.pack(side="left",padx=85, pady=10)
+        redo_button = tkinter.Button(text="redo", command=self.redo)
+        redo_button.pack(side="left",padx=85, pady=10)
         self.size_button = Scale(label="Thickness", from_=1, to=10, orient=HORIZONTAL)
         self.size_button.pack(side="left", padx=85, pady=10)
