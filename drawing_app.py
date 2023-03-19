@@ -79,7 +79,7 @@ class DrawingApp:
                 elif self.drawing_tool == "oval":
                     self.canvas.create_oval(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color, width=self.size_button.get(),tags="temp_objects")
                 elif self.drawing_tool == "line":
-                    self.canvas.create_line(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color, width=self.size_button.get(),tags="temp_objects")
+                    self.canvas.create_line(self.x1, self.y1, self.x_pos, self.y_pos, fill=self.color, width=self.size_button.get(),tags="temp_objects")
 
             self.x_pos = event.x
             self.y_pos = event.y
