@@ -17,6 +17,9 @@ class DrawingApp:
     def clicked(self, event=None):
         self.mouse_clicked = True
 
+        if self.drawing_tool == "select":
+            self.select(event)
+
         self.x1 = event.x
         self.y1 = event.y
 
@@ -35,7 +38,7 @@ class DrawingApp:
         self.x2 = event.x
         self.y2 = event.y
 
-    def draw(self, tool, color, w, coordinates = []):
+    def draw(self, tool, color, w, coordinates = [], is_undo = False):
         if tool == "rectangle":
             x = self.canvas.create_rectangle(coordinates[0], coordinates[1], coordinates[2], coordinates[3], outline=color,
                                      width=w)
@@ -52,17 +55,58 @@ class DrawingApp:
     
         self.stack.append([x, self.drawing_tool, color, w, [coordinates[0], coordinates[1], coordinates[2], coordinates[3]]])
 
+        # if is_undo:
+        #     try:
+        #         self.recentlyDeleted_operation.append("create")
+        #         self.recentlyDeleted.append([x, tool, color, w, [coordinates[0], coordinates[1], coordinates[2], coordinates[3]]])
+        #     except:
+        #         print("problem")
+        # else:
+        #     self.stack_operation.append("create")
+        #     self.stack.append([x, self.drawing_tool, color, w, [coordinates[0], coordinates[1], coordinates[2], coordinates[3]]])
+
     def undo(self):
         properties = self.stack.pop()
         self.recentlyDeleted.append(properties)
-        print(properties)
         self.canvas.delete(properties[0])
+        # operation = self.stack_operation.pop()
+        # if operation == "create":
+        #     self.recentlyDeleted.append(properties)
+        #     self.recentlyDeleted_operation.append("delete")
+        #     self.canvas.delete(properties[0])
+        # elif operation == "delete":
+        #     self.draw(properties[1], properties[2], properties[3], properties[4], True)
+
 
     def redo(self):
         recent = self.recentlyDeleted.pop()
         self.draw(recent[1],recent[2],recent[3],recent[4])
-        self.canvas.insert(self.recentlyDeleted.pop())
+        # operation = self.recentlyDeleted_operation.pop()
+        # if operation == "create":
+        #     self.stack.append(recent)
+        #     self.stack_operation.append("delete")
+        #     self.canvas.delete(recent[0])
+        # elif operation == "delete":    
+        #     self.draw(recent[1], recent[2], recent[3], recent[4])
+        
 
+    def select(self, event = None):
+        if self.selected is not None:
+            self.canvas.itemconfig(self.selected, outline="black", )
+
+        closest = self.canvas.find_closest(event.x, event.y)[0]
+
+        self.canvas.itemconfig(closest, outline="red", width=3)
+        self.selected = closest
+
+    def delete(self):
+        if self.selected is not None:
+            for object in self.stack:
+                if object[0] == self.selected:
+                    # self.stack.remove(object)
+                    # self.stack.append(object)
+                    # self.stack_operation.append("delete")
+                    self.canvas.delete(self.selected)
 
     def motion(self, event=None):
         self.canvas.delete('temp_objects')
@@ -80,7 +124,23 @@ class DrawingApp:
                     self.canvas.create_oval(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color, width=self.size_button.get(),tags="temp_objects")
                 elif self.drawing_tool == "line":
                     self.canvas.create_line(self.x1, self.y1, self.x_pos, self.y_pos, fill=self.color, width=self.size_button.get(),tags="temp_objects")
+                elif self.drawing_tool == "move":
+                    coords_moving = []
+                    for x in self.stack:
+                        if x[0] == self.selected:
+                            coords_moving = x[4]
 
+                    x_diff = (self.x_pos - self.x1)/30
+                    y_diff = (self.y_pos - self.y1)/30
+                    print(x_diff)
+                    print(y_diff)
+                    print(coords_moving)
+                    coords_moving[0] = coords_moving[0] + x_diff
+                    coords_moving[1] = coords_moving[1] + y_diff
+                    coords_moving[2] = coords_moving[2] + x_diff
+                    coords_moving[3] = coords_moving[3] + y_diff
+                    print(coords_moving)
+                    self.canvas.coords(self.selected, coords_moving)
             self.x_pos = event.x
             self.y_pos = event.y
 
@@ -106,13 +166,16 @@ class DrawingApp:
         drawing_area.bind("<ButtonRelease-1>", self.unclicked)
         self.canvas = drawing_area
         self.color = None
-                
+        self.selected = None        
+
         self.Lines = []
         self.Circles = []
         self.Rectangles = []
         self.Drawing = []
         self.stack = []
+        self.stack_operation = []
         self.recentlyDeleted = []
+        self.recentlyDeleted_operation = []
 
         rect_button = tkinter.Button(text="Rectangle", command=lambda: self.set_brush_type("rectangle"))
         rect_button.pack(side="left", padx=55, pady=10)
@@ -122,6 +185,12 @@ class DrawingApp:
         circle_button.pack(side="left", padx=65, pady=10)
         line_button = tkinter.Button(text="Line", command=lambda: self.set_brush_type("line"))
         line_button.pack(side="left", padx=70, pady=10)
+        select_button = tkinter.Button(text="Select", command=lambda: self.set_brush_type("select"))
+        select_button.pack(side="left", padx=70, pady=10)
+        move_button = tkinter.Button(text="Move", command=lambda: self.set_brush_type("move"))
+        move_button.pack(side="left", padx=70, pady=10)
+        delete_button = tkinter.Button(text="Delete", command=self.delete)
+        delete_button.pack(side="left", padx=70, pady=10)
         color_button = tkinter.Button(text="Color", command=self.choose_color)
         color_button.pack(side="left", padx=75, pady=10)
         #eraser_button = tkinter.Button(text="Eraser", command=self.eraser_mode)
