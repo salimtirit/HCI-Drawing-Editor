@@ -117,21 +117,26 @@ class DrawingApp:
                     self.canvas.delete(self.selected)
 
     def motion(self, event=None):
-        self.canvas.delete('temp_objects')
+        self.canvas.delete('temp_objects') # deletes the temporary objects. If the temp objects are not deleted all objects created along the way stays on the canvas.
         if self.mouse_clicked:
             if self.x_pos is not None and self.y_pos is not None:
+                #creare a smooth looking drawing using small lines.
                 if self.drawing_tool == "pencil":
                     x = self.canvas.create_line(self.x_pos, self.y_pos, event.x, event.y, smooth=True, fill=self.color, width=self.button.size_button.get())
                     self.Drawing.append(x)
                 #this eraser is simply a very thick pencil that has the same color with the background. I believe a better version may be implemented. Although this is a backup :)
                 elif self.drawing_tool == "eraser":
                     self.canvas.create_line(self.x_pos, self.y_pos, event.x, event.y, smooth=True, fill="white", width=self.button.size_button.get()*5)
+                #creates temporary rectangles while the user is moving the cursor with tag temp_objects.
                 elif self.drawing_tool == "rectangle":
                     self.canvas.create_rectangle(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color, width=self.button.size_button.get(),tags='temp_objects')          
+                #creates temporary ovals while the user is moving the cursor with tag temp_objects.
                 elif self.drawing_tool == "oval":
                     self.canvas.create_oval(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color, width=self.button.size_button.get(),tags="temp_objects")
+                #creates temporary lines while the user is moving the cursor with tag temp_objects.
                 elif self.drawing_tool == "line":
                     self.canvas.create_line(self.x1, self.y1, self.x_pos, self.y_pos, fill=self.color, width=self.button.size_button.get(),tags="temp_objects")
+                #creates temporary lines while the user is moving the cursor with tag temp_objects.
                 elif self.drawing_tool == "move":
                     coords_moving = []
                     for x in self.stack:
