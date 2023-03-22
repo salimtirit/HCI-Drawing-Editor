@@ -16,9 +16,9 @@ class DrawingApp:
     def clicked(self, event=None):
         self.mouse_clicked = True
 
-        if self.drawing_tool == "select":
+        if self.drawing_tool == "select": #select 
             self.select(event)
-        elif self.drawing_tool != "move" and self.selected is not None:
+        elif self.drawing_tool != "move" and self.selected is not None: #unselect
             if self.selected in self.Lines:
                 self.canvas.itemconfig(self.selected, fill="black")
             else:
@@ -38,11 +38,10 @@ class DrawingApp:
         self.x_pos = None
         self.y_pos = None
 
-        # draws straight line with first and last position of the cursor after dragging
-
         self.x2 = event.x
         self.y2 = event.y
 
+    #draws the approprate shape on the canvas.  
     def draw(self, tool, color, w, coordinates = [], is_undo = False):
         if tool == "rectangle":
             x = self.canvas.create_rectangle(coordinates[0], coordinates[1], coordinates[2], coordinates[3], outline=color,
@@ -70,6 +69,7 @@ class DrawingApp:
         #     self.stack_operation.append("create")
         #     self.stack.append([x, self.drawing_tool, color, w, [coordinates[0], coordinates[1], coordinates[2], coordinates[3]]])
 
+    #undo s the last operation
     def undo(self):
         properties = self.stack.pop()
         self.recentlyDeleted.append(properties)
@@ -82,7 +82,7 @@ class DrawingApp:
         # elif operation == "delete":
         #     self.draw(properties[1], properties[2], properties[3], properties[4], True)
 
-
+    #redos the last undo operation
     def redo(self):
         recent = self.recentlyDeleted.pop()
         self.draw(recent[1],recent[2],recent[3],recent[4])
@@ -94,7 +94,7 @@ class DrawingApp:
         # elif operation == "delete":    
         #     self.draw(recent[1], recent[2], recent[3], recent[4])
         
-
+    #selects the closest object to the cursor and unselects the one that has been selected before.
     def select(self, event = None):
         if self.selected is not None:
             self.canvas.itemconfig(self.selected, outline="black")
@@ -107,6 +107,7 @@ class DrawingApp:
             self.canvas.itemconfig(closest, outline="red")
         self.selected = closest
 
+    #deletes the selected object
     def delete(self):
         if self.selected is not None:
             for object in self.stack:
@@ -157,12 +158,9 @@ class DrawingApp:
     def choose_color(self):
         self.color = askcolor(color=self.color)[1]
 
-    #these methods sets the brush type
+    #this method sets the brush type pencil, eraser, rectangle, oval, line or move
     def set_brush_type(self, type):
         self.drawing_tool = type
-
-    def eraser_mode(self):
-       self.drawing_tool = "eraser"
 
     def __init__(self, root):
         self.x = 0
