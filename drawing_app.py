@@ -1,7 +1,6 @@
-import tkinter
 from tkinter import *
 from tkinter.colorchooser import askcolor
-
+from buttons import Buttons
 
 class DrawingApp:
     #default color and brush values
@@ -35,7 +34,7 @@ class DrawingApp:
         self.mouse_clicked = False
         #draws rectangle with first and last position of the cursor after dragging
         if self.x_pos and self.y_pos:
-            self.draw(self.drawing_tool, self.color, self.size_button.get(), [self.x1, self.y1, self.x_pos, self.y_pos])
+            self.draw(self.drawing_tool, self.color, self.button.size_button.get(), [self.x1, self.y1, self.x_pos, self.y_pos])
         self.x_pos = None
         self.y_pos = None
 
@@ -122,17 +121,17 @@ class DrawingApp:
         if self.mouse_clicked:
             if self.x_pos is not None and self.y_pos is not None:
                 if self.drawing_tool == "pencil":
-                    x = self.canvas.create_line(self.x_pos, self.y_pos, event.x, event.y, smooth=True, fill=self.color, width=self.size_button.get())
+                    x = self.canvas.create_line(self.x_pos, self.y_pos, event.x, event.y, smooth=True, fill=self.color, width=self.button.size_button.get())
                     self.Drawing.append(x)
-               #this eraser is simply a very thick pencil that has the same color with the background. I believe a better version may be implemented. Although this is a backup :)
-                #elif self.drawing_tool == "eraser":
-                    #event.widget.create_line(self.x_pos, self.y_pos, event.x, event.y, smooth=True, fill="white", width=self.size_button.get()*5)
+                #this eraser is simply a very thick pencil that has the same color with the background. I believe a better version may be implemented. Although this is a backup :)
+                elif self.drawing_tool == "eraser":
+                    self.canvas.create_line(self.x_pos, self.y_pos, event.x, event.y, smooth=True, fill="white", width=self.button.size_button.get()*5)
                 elif self.drawing_tool == "rectangle":
-                    self.canvas.create_rectangle(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color, width=self.size_button.get(),tags='temp_objects')          
+                    self.canvas.create_rectangle(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color, width=self.button.size_button.get(),tags='temp_objects')          
                 elif self.drawing_tool == "oval":
-                    self.canvas.create_oval(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color, width=self.size_button.get(),tags="temp_objects")
+                    self.canvas.create_oval(self.x1, self.y1, self.x_pos, self.y_pos, outline=self.color, width=self.button.size_button.get(),tags="temp_objects")
                 elif self.drawing_tool == "line":
-                    self.canvas.create_line(self.x1, self.y1, self.x_pos, self.y_pos, fill=self.color, width=self.size_button.get(),tags="temp_objects")
+                    self.canvas.create_line(self.x1, self.y1, self.x_pos, self.y_pos, fill=self.color, width=self.button.size_button.get(),tags="temp_objects")
                 elif self.drawing_tool == "move":
                     coords_moving = []
                     for x in self.stack:
@@ -141,14 +140,10 @@ class DrawingApp:
 
                     x_diff = (self.x_pos - self.x1)/40
                     y_diff = (self.y_pos - self.y1)/40
-                    print(x_diff)
-                    print(y_diff)
-                    print(coords_moving)
                     coords_moving[0] = coords_moving[0] + x_diff
                     coords_moving[1] = coords_moving[1] + y_diff
                     coords_moving[2] = coords_moving[2] + x_diff
                     coords_moving[3] = coords_moving[3] + y_diff
-                    print(coords_moving)
                     self.canvas.coords(self.selected, coords_moving)
             self.x_pos = event.x
             self.y_pos = event.y
@@ -161,8 +156,8 @@ class DrawingApp:
     def set_brush_type(self, type):
         self.drawing_tool = type
 
-    #def eraser_mode(self):
-    #    self.drawing_tool = "eraser"
+    def eraser_mode(self):
+       self.drawing_tool = "eraser"
 
     def __init__(self, root):
         self.x = 0
@@ -186,27 +181,4 @@ class DrawingApp:
         self.recentlyDeleted = []
         self.recentlyDeleted_operation = []
 
-        rect_button = tkinter.Button(text="Rectangle", command=lambda: self.set_brush_type("rectangle"))
-        rect_button.pack(side="left", padx=40, pady=10)
-        pencil_button = tkinter.Button(text="Pencil", command=lambda: self.set_brush_type("pencil"))
-        pencil_button.pack(side="left", padx=40, pady=10)
-        circle_button = tkinter.Button(text="Circle", command=lambda: self.set_brush_type("oval"))
-        circle_button.pack(side="left", padx=40, pady=10)
-        line_button = tkinter.Button(text="Line", command=lambda: self.set_brush_type("line"))
-        line_button.pack(side="left", padx=40, pady=10)
-        select_button = tkinter.Button(text="Select", command=lambda: self.set_brush_type("select"))
-        select_button.pack(side="left", padx=40, pady=10)
-        move_button = tkinter.Button(text="Move", command=lambda: self.set_brush_type("move"))
-        move_button.pack(side="left", padx=40, pady=10)
-        delete_button = tkinter.Button(text="Delete", command=self.delete)
-        delete_button.pack(side="left", padx=40, pady=10)
-        color_button = tkinter.Button(text="Color", command=self.choose_color)
-        color_button.pack(side="left", padx=40, pady=10)
-        #eraser_button = tkinter.Button(text="Eraser", command=self.eraser_mode)
-        #eraser_button.pack(side="left", padx=40, pady=10)
-        undo_button = tkinter.Button(text="Undo", command=self.undo)
-        undo_button.pack(side="left",padx=40, pady=10)
-        redo_button = tkinter.Button(text="Redo", command=self.redo)
-        redo_button.pack(side="left",padx=40, pady=10)
-        self.size_button = Scale(label="Thickness", from_=1, to=10, orient=HORIZONTAL)
-        self.size_button.pack(side="left", padx=40, pady=10)
+        self.button = Buttons(self)
