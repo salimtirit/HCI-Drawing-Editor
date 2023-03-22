@@ -19,6 +19,12 @@ class DrawingApp:
 
         if self.drawing_tool == "select":
             self.select(event)
+        elif self.drawing_tool != "move" and self.selected is not None:
+            if self.selected in self.Lines:
+                self.canvas.itemconfig(self.selected, fill="black")
+            else:
+                self.canvas.itemconfig(self.selected, outline="black")
+            self.selected = None
 
         self.x1 = event.x
         self.y1 = event.y
@@ -92,11 +98,14 @@ class DrawingApp:
 
     def select(self, event = None):
         if self.selected is not None:
-            self.canvas.itemconfig(self.selected, outline="black", )
+            self.canvas.itemconfig(self.selected, outline="black")
 
         closest = self.canvas.find_closest(event.x, event.y)[0]
 
-        self.canvas.itemconfig(closest, outline="red", width=3)
+        if closest in self.Lines:
+            self.canvas.itemconfig(closest, fill="red")
+        else:
+            self.canvas.itemconfig(closest, outline="red")
         self.selected = closest
 
     def delete(self):
@@ -130,8 +139,8 @@ class DrawingApp:
                         if x[0] == self.selected:
                             coords_moving = x[4]
 
-                    x_diff = (self.x_pos - self.x1)/30
-                    y_diff = (self.y_pos - self.y1)/30
+                    x_diff = (self.x_pos - self.x1)/40
+                    y_diff = (self.y_pos - self.y1)/40
                     print(x_diff)
                     print(y_diff)
                     print(coords_moving)
@@ -178,26 +187,26 @@ class DrawingApp:
         self.recentlyDeleted_operation = []
 
         rect_button = tkinter.Button(text="Rectangle", command=lambda: self.set_brush_type("rectangle"))
-        rect_button.pack(side="left", padx=55, pady=10)
+        rect_button.pack(side="left", padx=40, pady=10)
         pencil_button = tkinter.Button(text="Pencil", command=lambda: self.set_brush_type("pencil"))
-        pencil_button.pack(side="left", padx=60, pady=10)
+        pencil_button.pack(side="left", padx=40, pady=10)
         circle_button = tkinter.Button(text="Circle", command=lambda: self.set_brush_type("oval"))
-        circle_button.pack(side="left", padx=65, pady=10)
+        circle_button.pack(side="left", padx=40, pady=10)
         line_button = tkinter.Button(text="Line", command=lambda: self.set_brush_type("line"))
-        line_button.pack(side="left", padx=70, pady=10)
+        line_button.pack(side="left", padx=40, pady=10)
         select_button = tkinter.Button(text="Select", command=lambda: self.set_brush_type("select"))
-        select_button.pack(side="left", padx=70, pady=10)
+        select_button.pack(side="left", padx=40, pady=10)
         move_button = tkinter.Button(text="Move", command=lambda: self.set_brush_type("move"))
-        move_button.pack(side="left", padx=70, pady=10)
+        move_button.pack(side="left", padx=40, pady=10)
         delete_button = tkinter.Button(text="Delete", command=self.delete)
-        delete_button.pack(side="left", padx=70, pady=10)
+        delete_button.pack(side="left", padx=40, pady=10)
         color_button = tkinter.Button(text="Color", command=self.choose_color)
-        color_button.pack(side="left", padx=75, pady=10)
+        color_button.pack(side="left", padx=40, pady=10)
         #eraser_button = tkinter.Button(text="Eraser", command=self.eraser_mode)
-        #eraser_button.pack(side="left", padx=80, pady=10)
-        undo_button = tkinter.Button(text="undo", command=self.undo)
-        undo_button.pack(side="left",padx=85, pady=10)
-        redo_button = tkinter.Button(text="redo", command=self.redo)
-        redo_button.pack(side="left",padx=85, pady=10)
+        #eraser_button.pack(side="left", padx=40, pady=10)
+        undo_button = tkinter.Button(text="Undo", command=self.undo)
+        undo_button.pack(side="left",padx=40, pady=10)
+        redo_button = tkinter.Button(text="Redo", command=self.redo)
+        redo_button.pack(side="left",padx=40, pady=10)
         self.size_button = Scale(label="Thickness", from_=1, to=10, orient=HORIZONTAL)
-        self.size_button.pack(side="left", padx=85, pady=10)
+        self.size_button.pack(side="left", padx=40, pady=10)
