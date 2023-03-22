@@ -20,7 +20,7 @@ class Buttons:
         self.delete_button.pack(side="left", padx=40, pady=10)
         self.color_button = tkinter.Button(text="Color", command=drawing_app.choose_color)
         self.color_button.pack(side="left", padx=40, pady=10)
-        self.eraser_button = tkinter.Button(text="Eraser", command=drawing_app.eraser_mode)
+        self.eraser_button = tkinter.Button(text="Eraser", command=lambda: drawing_app.set_brush_type("eraser"))
         self.eraser_button.pack(side="left", padx=40, pady=10)
         self.undo_button = tkinter.Button(text="Undo", command=drawing_app.undo)
         self.undo_button.pack(side="left",padx=40, pady=10)
