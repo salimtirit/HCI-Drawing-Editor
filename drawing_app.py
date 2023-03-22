@@ -32,8 +32,8 @@ class DrawingApp:
     def unclicked(self, event=None):
         self.canvas.delete('temp_objects')
         self.mouse_clicked = False
-        #draws rectangle with first and last position of the cursor after dragging
-        if self.x_pos and self.y_pos:
+        #draws object with first and last position of the cursor after dragging
+        if self.x_pos and self.y_pos or self.drawing_tool == "move":
             self.draw(self.drawing_tool, self.color, self.button.size_button.get(), [self.x1, self.y1, self.x_pos, self.y_pos])
         self.x_pos = None
         self.y_pos = None
@@ -43,21 +43,30 @@ class DrawingApp:
 
     #draws the approprate shape on the canvas.  
     def draw(self, tool, color, w, coordinates = [], is_undo = False):
-        if tool == "rectangle":
-            x = self.canvas.create_rectangle(coordinates[0], coordinates[1], coordinates[2], coordinates[3], outline=color,
-                                     width=w)
-            self.Rectangles.append(x)
-        # draws oval with first and last position of the cursor after dragging
-        if tool == "oval":
-            x = self.canvas.create_oval(coordinates[0], coordinates[1], coordinates[2], coordinates[3], outline=color,
-                                width=w)
-            self.Circles.append(x)
-        if tool == "line":
-            x = self.canvas.create_line(coordinates[0], coordinates[1], coordinates[2], coordinates[3], smooth=True, fill=color,
-                                 width=w)
-            self.Lines.append(x)
-    
-        self.stack.append([x, self.drawing_tool, color, w, [coordinates[0], coordinates[1], coordinates[2], coordinates[3]]])
+        if tool == "move" and self.selected is not None:
+            #([x, self.drawing_tool, color, w, [coordinates[0], coordinates[1], coordinates[2], coordinates[3]]])
+            a = self.moving_object
+            self.draw(a[1], a[2], a[3], self.last_coords)
+            self.selected = None
+            self.last_coords = None
+            self.moving_object = None
+            return
+        else:
+            if tool == "rectangle":
+                x = self.canvas.create_rectangle(coordinates[0], coordinates[1], coordinates[2], coordinates[3], outline=color,
+                                        width=w)
+                self.Rectangles.append(x)
+            # draws oval with first and last position of the cursor after dragging
+            if tool == "oval":
+                x = self.canvas.create_oval(coordinates[0], coordinates[1], coordinates[2], coordinates[3], outline=color,
+                                    width=w)
+                self.Circles.append(x)
+            if tool == "line":
+                x = self.canvas.create_line(coordinates[0], coordinates[1], coordinates[2], coordinates[3], smooth=True, fill=color,
+                                    width=w)
+                self.Lines.append(x)
+        
+            self.stack.append([x, self.drawing_tool, color, w, [coordinates[0], coordinates[1], coordinates[2], coordinates[3]]])
 
         # if is_undo:
         #     try:
@@ -105,6 +114,11 @@ class DrawingApp:
             self.canvas.itemconfig(closest, fill="red")
         else:
             self.canvas.itemconfig(closest, outline="red")
+
+        for x in self.stack:
+            if x[0] == closest:
+              self.moving_object = x
+
         self.selected = closest
 
     #deletes the selected object
@@ -121,7 +135,7 @@ class DrawingApp:
         self.canvas.delete('temp_objects') # deletes the temporary objects. If the temp objects are not deleted all objects created along the way stays on the canvas.
         if self.mouse_clicked:
             if self.x_pos is not None and self.y_pos is not None:
-                #creare a smooth looking drawing using small lines.
+                #create a smooth looking drawing using small lines.
                 if self.drawing_tool == "pencil":
                     x = self.canvas.create_line(self.x_pos, self.y_pos, event.x, event.y, smooth=True, fill=self.color, width=self.button.size_button.get())
                     self.Drawing.append(x)
@@ -139,17 +153,27 @@ class DrawingApp:
                     self.canvas.create_line(self.x1, self.y1, self.x_pos, self.y_pos, fill=self.color, width=self.button.size_button.get(),tags="temp_objects")
                 #creates temporary lines while the user is moving the cursor with tag temp_objects.
                 elif self.drawing_tool == "move":
-                    coords_moving = []
-                    for x in self.stack:
-                        if x[0] == self.selected:
-                            coords_moving = x[4]
+                    if self.moving_object in self.stack:
+                        self.stack.remove(self.moving_object)
+                        self.canvas.delete(self.moving_object[0])
+                    coords_moving = self.moving_object[4]            
+                    x_diff = coords_moving[0] - coords_moving[2]
+                    y_diff = coords_moving[1] - coords_moving[3]
+                    x_1 = event.x - x_diff/2
+                    x_2 = event.x + x_diff/2
+                    y_1 = event.y - y_diff/2
+                    y_2 = event.y + y_diff/2
+                    self.last_coords = [x_1, y_1, x_2, y_2]
+                    #([x, self.drawing_tool, color, w, [coordinates[0], coordinates[1], coordinates[2], coordinates[3]]])
+                    if self.moving_object[1] == "rectangle":
+                        self.canvas.create_rectangle(x_1, y_1, x_2, y_2, outline=self.moving_object[2], width=self.moving_object[3],tags='temp_objects')          
+                    #creates temporary ovals while the user is moving the cursor with tag temp_objects.
+                    elif self.moving_object[1] == "oval":
+                        self.canvas.create_oval(x_1, y_1, x_2, y_2, outline=self.moving_object[2], width=self.moving_object[3],tags="temp_objects")
+                    #creates temporary lines while the user is moving the cursor with tag temp_objects.
+                    elif self.moving_object[1] == "line":
+                        self.canvas.create_line(x_1, y_1, x_2, y_2, fill=self.moving_object[2], width=self.moving_object[3],tags="temp_objects")
 
-                    x_diff = (self.x_pos - self.x1)/40
-                    y_diff = (self.y_pos - self.y1)/40
-                    coords_moving[0] = coords_moving[0] + x_diff
-                    coords_moving[1] = coords_moving[1] + y_diff
-                    coords_moving[2] = coords_moving[2] + x_diff
-                    coords_moving[3] = coords_moving[3] + y_diff
                     self.canvas.coords(self.selected, coords_moving)
             self.x_pos = event.x
             self.y_pos = event.y
@@ -174,7 +198,8 @@ class DrawingApp:
         self.canvas = drawing_area
         self.color = None
         self.selected = None        
-
+        self.moving_object = None
+        self.last_coords = None
         self.Lines = []
         self.Circles = []
         self.Rectangles = []
