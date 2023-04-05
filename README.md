@@ -1,6 +1,8 @@
 ﻿# HCI-Drawing-Editor
 
-A simple object-oriented drawing editor that allows a user to create, move and erase squares, circles and lines in an interactive graphics.
+A simple object-oriented drawing editor that allows a user to create, move and erase squares, circles (ellipses) and lines in an interactive graphics.
+
+The user can change the color or the thickness of the drawing. Undo and redo buttons are implemented.
 
 ### How To Run
 
